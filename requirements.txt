@@ -2,3 +2,5 @@ s3fs
 tritonclient[http]
 awkward
 uproot
+pandas
+matplotlib
