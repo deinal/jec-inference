@@ -11,12 +11,12 @@ Now you can run the `inference.ipynb` notebook.
 ## Jobs
 
 Parallel inference on Kubeflow using Kuberenetes jobs
-    - https://kubernetes.io/docs/tasks/job/
+  - https://kubernetes.io/docs/tasks/job/
 
-Tried indexed queue: `indexed_job.yaml`. However, it used file from index zero for all jobs...
+Tried indexed queue with `indexed_job.yaml`. However, it used file from index zero for all jobs...
 
 Instead tried expansion of jobs 
-    - https://kubernetes.io/docs/tasks/job/parallel-processing-expansion/
-    - Run: `./create_jobs.sh`
-    - Monitor: `watch -n 1 kubectl get pods`
-    - Cleanup: `kubectl delete job -l jobgroup=inference`
+  - https://kubernetes.io/docs/tasks/job/parallel-processing-expansion/
+  - Run: `./create_jobs.sh`
+  - Monitor: `watch -n 1 kubectl get pods`
+  - Cleanup: `kubectl delete job -l jobgroup=inference`
