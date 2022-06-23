@@ -4,3 +4,5 @@ awkward
 uproot
 pandas
 matplotlib
+tqdm
+pyyaml
