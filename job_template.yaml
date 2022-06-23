@@ -1,0 +1,18 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job-$ROOTFILE
+  namespace: dholmber
+  labels:
+    jobgroup: inference
+spec:
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: jec-inference
+        image: registry.cern.ch/ml/jec-inference:latest
+        command: ["python3",  "inference.py", "--fname=s3://jec-data/test/$ROOTFILE"]
