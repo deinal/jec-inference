@@ -1,0 +1,21 @@
+apiVersion: serving.kubeflow.org/v1beta1
+kind: InferenceService
+metadata:
+  name: pfn
+  namespace: dholmber
+spec:
+  predictor:
+    serviceAccountName: sa
+    containerConcurrency: 1
+    triton:
+      storageUri: "s3://jec-data/pfn-regressor-ea37f4"
+      args: 
+        - --strict-model-config=false
+        - --log-verbose=1
+      resources:
+        limits:
+          cpu:     2
+          memory:  4Gi
+        requests:
+          cpu:      1
+          memory:   10Mi
