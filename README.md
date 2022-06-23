@@ -10,6 +10,9 @@ Now you can run the `inference.ipynb` notebook.
 
 ## Jobs
 
+Serve a PFN model stored on s3
+  - `kubectl apply -f serve.yaml`
+
 Parallel inference on Kubeflow using Kuberenetes jobs
   - https://kubernetes.io/docs/tasks/job/
 
