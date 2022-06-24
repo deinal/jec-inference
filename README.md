@@ -10,6 +10,12 @@ Now you can run the `inference.ipynb` notebook.
 
 ## Jobs
 
+Build inference image
+```
+docker build . -t registry.cern.ch/ml/jec-inference
+docker push registry.cern.ch/ml/jec-inference
+```
+
 Parallel inference on Kubeflow using Kuberenetes jobs
   - https://kubernetes.io/docs/tasks/job/
 

@@ -62,6 +62,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Pipeline Params')
     parser.add_argument('--file', type=str)
     parser.add_argument('--fname', type=str)
+    parser.add_argument('--url', type=str)
     args = parser.parse_args()
 
     if args.fname:
@@ -78,6 +79,6 @@ if __name__ == '__main__':
     for key in pfn_input_data:
         print(key, pfn_input_data[key].shape)
 
-    pfn_triton_client = httpclient.InferenceServerClient(url='pfn-regressor-ea37f4.dholmber.svc.cluster.local', verbose=False)
+    pfn_triton_client = httpclient.InferenceServerClient(url=args.url, verbose=False)
 
     pfn_predictions = get_predictions(pfn_triton_client, pfn_input_data, data_len)
