@@ -15,4 +15,4 @@ spec:
       containers:
       - name: jec-inference
         image: registry.cern.ch/ml/jec-inference:latest
-        command: ["python3",  "inference.py", "--fname=s3://jec-data/test/$ROOTFILE"]
+        command: ["python3",  "inference.py", "--fname=s3://jec-data/train/$ROOTFILE", "--url=pfn.dholmber.svc.cluster.local"]

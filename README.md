@@ -15,6 +15,8 @@ Build inference image
 docker build . -t registry.cern.ch/ml/jec-inference
 docker push registry.cern.ch/ml/jec-inference
 ```
+Serve a PFN model stored on s3
+  - `kubectl apply -f serve.yaml`
 
 Parallel inference on Kubeflow using Kuberenetes jobs
   - https://kubernetes.io/docs/tasks/job/
