@@ -43,7 +43,7 @@ def plot_distrs(dataframe, names, fig_dir):
 
     binning = np.linspace(0.5, 1.5, num=101)
     pt_bins = [(30, np.inf), (30, 40), (100, 110), (1000, 1100)]
-    eta_bins = [(0., 2.5), (2.5, 5)]
+    eta_bins = [(0, 1.3), (1.3, 2.5)]
 
     histograms = {}
     for name in names:
@@ -135,7 +135,7 @@ def compare_flavours(dataframe, names, fig_dir):
     data = {}
 
     pt_bins = [(30, np.inf), (30, 50), (50, 100), (100, 300), (300, 1000), (1000, np.inf)]
-    eta_bins = [(0., 2.5), (2.5, 5)]
+    eta_bins = [(0, 1.3), (1.3, 2.5)]
 
     for (ipt, pt_bin), (ieta, eta_bin) in itertools.product(
         enumerate(pt_bins), enumerate(eta_bins)
@@ -473,7 +473,7 @@ if __name__ == '__main__':
 
     data = {}
     for (ieta, eta_bin), (flavour_label, flavour_ids) in itertools.product(
-        enumerate([(0, 2.5), (2.5, 5)], start=1),
+        enumerate([(0, 1.3), (1.3, 2.5)], start=1),
         [
             ('uds', {1, 2, 3}), ('c', {4}), ('b', {5}), ('g', {21}),
             ('all', {0, 1, 2, 3, 4, 5, 21})
@@ -509,7 +509,7 @@ if __name__ == '__main__':
         json.dump(data, f, indent='\t', default=to_serializable)
     
     for (ieta, eta_bin), flavours in itertools.product(
-        enumerate([(0, 2.5), (2.5, 5)], start=1),
+        enumerate([(0, 1.3), (1.3, 2.5)], start=1),
         itertools.combinations([('uds', {1, 2, 3}), ('c', {4}), ('b', {5}), ('g', {21})], r=2),
     ):
         bins = []
