@@ -9,8 +9,8 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from functools import singledispatch
 
-MARKERS = ['x', 's', 'o', '^', 'v']
-FLAVOR_MARKERS = ['*', 's', 'o', '^', 'v']
+MARKERS = ['o', 's', '^', 'x', 'v']
+FLAVOR_MARKERS = ['o', 's', '^', 'x', 'v']
 COLORS = ['tab:blue', 'tab:orange', 'tab:green', 'tab:red', 'tab:purple']
 
 SMALL_SIZE = 12
@@ -196,7 +196,7 @@ def compare_flavours(dataframe, names, fig_dir):
             bottom=True, top=True, left=True, right=True
         )
 
-        base_median = np.array(median['Standard'])
+        base_median = np.array(median['Baseline'])
         baseline = np.sum(np.abs(base_median - base_median.mean()))
         improvement = {}
         for name in names:
@@ -297,7 +297,7 @@ def compute_resolution_improvement(df, names):
     q2 = df.quantile(0.75)
     iqr = q2 - q1
     median = df.median()
-    baseline = iqr['Standard'] / median['Standard']
+    baseline = iqr['Baseline'] / median['Baseline']
     
     improvement = {}
     for name in names:
@@ -326,25 +326,25 @@ def plot_resolution(outdir, flavour_label, bins, bin_centers, eta_bin, ieta, bin
     for i, name in enumerate(names):
         iqr_median[name] = iqr[name] / median[name]
         iqr_median_error[name] = iqr_error[name] / median[name]
-        ratio[name] = iqr_median[name] / iqr_median['Standard']
+        ratio[name] = iqr_median[name] / iqr_median['Baseline']
         improvement[name] = 100 * (1 - np.nanmean(ratio[name]))
         axes_upper.errorbar(
             bin_centers, iqr_median[name], yerr=iqr_median_error[name],
             color=COLORS[i], ms=3, marker=MARKERS[i], lw=0, elinewidth=0.8, label=name
         )
-        if name != 'Standard':
+        if name != 'Baseline':
             axes_lower.plot(
                 bin_centers, ratio[name], color=COLORS[i], ms=3, marker=MARKERS[i], lw=0
             )
 
     axes_upper.set_ylim(0, None)
     if eta_bin[0] == 0:
-        axes_upper.set_ylim(0.0, 0.31)
-        axes_lower.set_ylim(0.85, 1.02)
+        axes_upper.set_ylim(0.0, 0.23)
+        axes_lower.set_ylim(0.86, 1.04)
     else:
-        axes_upper.set_ylim(0.0, 0.38)
-        axes_lower.set_ylim(0.78, 1.02)
-        axes_lower.set_yticks([0.8, 0.9, 1.0])
+        axes_upper.set_ylim(0.0, 0.23)
+        axes_lower.set_ylim(0.82, 1.04)
+        axes_lower.set_yticks([0.9, 1.0])
     for axes in [axes_upper, axes_lower]:
         axes.set_xscale('log')
         axes.set_xlim(binning[0], binning[-1])
@@ -464,7 +464,7 @@ if __name__ == '__main__':
         except FileExistsError:
             pass
     
-    names = ['Standard'] + args.names
+    names = ['Baseline'] + args.names
     plot_distrs(df, names, os.path.join(args.outdir, 'distributions'))
     compare_flavours(df, names, os.path.join(args.outdir, 'flavours'))
 

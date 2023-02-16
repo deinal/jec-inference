@@ -6,6 +6,7 @@ import pandas as pd
 import awkward as ak
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+from matplotlib.ticker import ScalarFormatter, FuncFormatter
 from glob import glob
 
 SMALL_SIZE = 16
@@ -29,7 +30,7 @@ def plot_spectrum(jet_df, outdir):
 
     fig = plt.figure(figsize=(8, 6.5))
     ax = fig.add_subplot()
-
+    
     plt.imshow(np.flipud(H.T), aspect='auto', norm=mpl.colors.LogNorm(vmin=1, vmax=H.max()))
     plt.xlabel('$p^\\mathrm{{gen}}_{T}$')
     plt.ylabel('$|\\eta^\\mathrm{{gen}}|$')
@@ -42,25 +43,43 @@ def plot_spectrum(jet_df, outdir):
 
     minor_ticks = list(range(0, 100, 10)) + list(range(100, 1000, 100)) + list(range(1000, 5000, 1000))
     ax.set_xticks(ticks=np.interp(minor_ticks, pt_bins, xrange), minor=True)
-
+    
     ylim = plt.gca().get_ylim()
     yrange = np.linspace(ylim[0], ylim[1], 30)
-    eta_ticks = [0, 0.5, 1, 1.5, 2, 2.5]
+    eta_ticks = [0.0, 0.5, 1.0, 1.5, 2.0, 2.5]
     plt.yticks(ticks=np.interp(eta_ticks, eta_bins, yrange), labels=eta_ticks)
     
-    plt.show()
+    ax.tick_params(axis='both', which='minor', width=1.2, length=2.5)
+    ax.tick_params(axis='both', which='major', width=1.2, length=5)
     
     for ext in ['png', 'pdf']:
         plt.savefig(os.path.join(outdir, ext, f'spectrum.{ext}'))
+        
+    plt.show()
     plt.close(fig)
 
 
 def plot_target(jet_df, outdir):
-    plt.hist(np.log(jet_df.pt_gen / jet_df.pt), bins=50)
-    plt.xlabel('$\log(p_T^\mathrm{gen} / p_T^\mathrm{reco})$')
-    plt.ylabel('Fraction of jets/bin')
-    plt.xlim([-1, 1])
-    plt.show()
+    fig = plt.figure(figsize=(8, 6.5))
+    ax = fig.add_subplot()
+
+
+    y_formatter = ScalarFormatter(useMathText=True)
+    y_formatter.set_powerlimits((-3,3))
+    ax.yaxis.set_major_formatter(y_formatter)
+    
+    ax.hist(np.log(jet_df.pt_gen / jet_df.pt), bins=100, histtype='stepfilled', linewidth=2, facecolor='white', hatch='////', edgecolor='tab:blue')
+    ax.set_xlabel('$\log(p_T^\mathrm{gen} / p_T^\mathrm{reco})$')
+    ax.set_ylabel('Fraction of jets/bin')
+    ax.set_xlim([-1.05, 1.05])
+    ax.tick_params(axis='both', which='major', width=1.2, length=7)
+    ax.tick_params(axis='both', which='minor', width=1.2, length=3)
+    
+    plt.tick_params(axis='both', which='both', direction='in')
+    plt.minorticks_on()
     
     for ext in ['png', 'pdf']:
         plt.savefig(os.path.join(outdir, ext, f'target.{ext}'))
+        
+    plt.show()
+    plt.close(fig)
