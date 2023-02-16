@@ -42,7 +42,7 @@ def plot_distrs(dataframe, names, fig_dir):
     """Plot distributions of response in a few representative bins."""
 
     binning = np.linspace(0.5, 1.5, num=101)
-    pt_bins = [(30, np.inf), (30, 40), (100, 110), (1000, 1100)]
+    pt_bins = [(30, np.inf), (30, 100), (100, 300), (300, 1000), (1000, np.inf)]
     eta_bins = [(0, 1.3), (1.3, 2.5)]
 
     histograms = {}
@@ -70,7 +70,7 @@ def plot_distrs(dataframe, names, fig_dir):
     for ipt, ieta, flavour in itertools.product(
         range(len(pt_bins)), range(len(eta_bins)), ['all', 'uds', 'c', 'b', 'g']
     ):
-        fig = plt.figure()
+        fig = plt.figure(figsize=(6, 4.8))
         ax = fig.add_subplot()
         for i, name in enumerate(names):
             ax.hist(
@@ -106,8 +106,9 @@ def plot_distrs(dataframe, names, fig_dir):
             axis='both', which='both', direction='in', 
             bottom=True, top=True, left=True, right=True
         )
+        ax.tick_params(axis='both', which='both', width=1.2)
 
-        for ext in ['png', 'pdf']:
+        for ext in ['png', 'pdf', 'svg']:
             fig.savefig(os.path.join(fig_dir, ext, f'{flavour}_pt{ipt + 1}_eta{ieta + 1}.{ext}'))
         
         if (ipt == 0) and (flavour == 'all'):
@@ -134,7 +135,7 @@ def compare_flavours(dataframe, names, fig_dir):
     
     data = {}
 
-    pt_bins = [(30, np.inf), (30, 50), (50, 100), (100, 300), (300, 1000), (1000, np.inf)]
+    pt_bins = [(30, np.inf), (30, 100), (100, 300), (300, 1000), (1000, np.inf)]
     eta_bins = [(0, 1.3), (1.3, 2.5)]
 
     for (ipt, pt_bin), (ieta, eta_bin) in itertools.product(
@@ -154,7 +155,7 @@ def compare_flavours(dataframe, names, fig_dir):
             for name in names:
                 median[name].append(df[name].median())
                 median_error[name].append(bootstrap_median(df[name]))
-        fig = plt.figure()
+        fig = plt.figure(figsize=(6, 4.8))
         ax = fig.add_subplot()
         offset = [0.1 * i for i in range(len(names))]
         offset = offset - np.mean(offset)
@@ -195,6 +196,7 @@ def compare_flavours(dataframe, names, fig_dir):
             axis='both', which='both', direction='in', 
             bottom=True, top=True, left=True, right=True
         )
+        ax.tick_params(axis='both', which='both', width=1.2)
 
         base_median = np.array(median['Baseline'])
         baseline = np.sum(np.abs(base_median - base_median.mean()))
@@ -211,7 +213,7 @@ def compare_flavours(dataframe, names, fig_dir):
             'median_error': median_error
         }
 
-        for ext in ['png', 'pdf']:
+        for ext in ['png', 'pdf', 'svg']:
             fig.savefig(os.path.join(fig_dir, ext, f'pt{ipt+1}eta{ieta+1}.{ext}'))
         
         if pt_bin == (30, np.inf):
@@ -233,7 +235,7 @@ def plot_median_response(outdir, flavour_label, bins, bin_centers, eta_bin, ieta
         for i, (_, df) in enumerate(bins):
             median_error[name][i] = bootstrap_median(df[name].to_numpy())
 
-    fig = plt.figure(figsize=(6.4, 5.3))
+    fig = plt.figure(figsize=(6, 4.8))
     
     ax = fig.add_subplot()
     
@@ -258,9 +260,10 @@ def plot_median_response(outdir, flavour_label, bins, bin_centers, eta_bin, ieta
         axis='both', which='both', direction='in', 
         bottom=True, top=True, left=True, right=True
     )
+    ax.tick_params(axis='both', which='both', width=1.2)
     ax.set_xscale('log')
 
-    for ext in ['png', 'pdf']:
+    for ext in ['png', 'pdf', 'svg']:
         fig.savefig(os.path.join(outdir, ext, f'{flavour_label}_eta{ieta}.{ext}'))
         
     if flavour_label == 'all':
@@ -317,7 +320,7 @@ def plot_resolution(outdir, flavour_label, bins, bin_centers, eta_bin, ieta, bin
         for i, (_, df) in enumerate(bins):
             iqr_error[name][i] = bootstrap_iqr(df[name].to_numpy())
 
-    fig = plt.figure(figsize=(6.4, 5.3))
+    fig = plt.figure(figsize=(6, 4.8))
     gs = mpl.gridspec.GridSpec(2, 1, hspace=0.02, height_ratios=[4, 1])
     axes_upper = fig.add_subplot(gs[0, 0])
     axes_lower = fig.add_subplot(gs[1, 0])
@@ -363,16 +366,16 @@ def plot_resolution(outdir, flavour_label, bins, bin_centers, eta_bin, ieta, bin
     axes_lower.set_ylabel('Ratio')
     axes_lower.set_xlabel(r'$p_\mathrm{T}^\mathrm{gen}$')
     axes_upper.tick_params(
-        axis='both', which='both', direction='in', 
+        axis='both', which='both', direction='in', width=1.2,
         bottom=True, top=True, left=True, right=True
     )
     axes_lower.tick_params(
-        axis='both', which='both', direction='in', 
+        axis='both', which='both', direction='in', width=1.2,
         bottom=True, top=True, left=True, right=True
     )
     fig.align_ylabels()
 
-    for ext in ['png', 'pdf']:
+    for ext in ['png', 'pdf', 'svg']:
         fig.savefig(os.path.join(outdir, ext, f'{flavour_label}_eta{ieta}_iqr.{ext}'))
     
     if flavour_label == 'all':
@@ -408,7 +411,7 @@ def plot_median_residual(outdir, bin_centers, flavour_labels, bins, eta_bin, iet
         difference[name] = median[name][0] - median[name][1]
         error[name] = np.sqrt(median_error[name][0] ** 2 + median_error[name][1] ** 2)
 
-    fig = plt.figure(figsize=(7.8, 5.3))
+    fig = plt.figure(figsize=(6, 4.8))
     ax = fig.add_subplot()
     for i, name in enumerate(names):
         ax.errorbar(
@@ -430,7 +433,7 @@ def plot_median_residual(outdir, bin_centers, flavour_labels, bins, eta_bin, iet
         bottom=True, top=True, left=True, right=True
     )
 
-    for ext in ['png', 'pdf']:
+    for ext in ['png', 'pdf', 'svg']:
         fig.savefig(os.path.join(outdir, ext, f'{flavour_labels[0]}-{flavour_labels[1]}_eta{ieta}.{ext}'))
         
     if flavour_labels == ('uds', 'g'):
@@ -459,7 +462,7 @@ if __name__ == '__main__':
 
     for subdir in ['distributions', 'flavours', 'response', 'resolution', 'residual']:
         try:
-            for ext in ['png', 'pdf']:
+            for ext in ['png', 'pdf', 'svg']:
                 os.makedirs(os.path.join(args.outdir, subdir, ext))
         except FileExistsError:
             pass
@@ -497,7 +500,7 @@ if __name__ == '__main__':
         )
 
         for (ipt, pt_bin) in enumerate(
-                [(30, np.inf), (30, 50), (50, 100), (100, 300), (300, 1000), (1000, np.inf)], start=1
+                [(30, np.inf), (30, 100), (100, 300), (300, 1000), (1000, np.inf)], start=1
             ):
             pt_bin = df_bin[
                 (df_bin.pt_gen >= pt_bin[0])

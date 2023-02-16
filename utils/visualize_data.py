@@ -9,9 +9,9 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import ScalarFormatter, FuncFormatter
 from glob import glob
 
-SMALL_SIZE = 16
-MEDIUM_SIZE = 18
-BIG_SIZE = 20
+SMALL_SIZE = 12
+MEDIUM_SIZE = 14
+BIG_SIZE = 16
 
 plt.rc('font', size=SMALL_SIZE)          # controls default text sizes
 plt.rc('axes', titlesize=SMALL_SIZE)     # fontsize of the axes title
@@ -28,7 +28,7 @@ def plot_spectrum(jet_df, outdir):
 
     H, _, _ = np.histogram2d(jet_df.pt_gen, jet_df.eta_gen.abs(), bins=(pt_bins, eta_bins))
 
-    fig = plt.figure(figsize=(8, 6.5))
+    fig = plt.figure(figsize=(6, 4.8))
     ax = fig.add_subplot()
     
     plt.imshow(np.flipud(H.T), aspect='auto', norm=mpl.colors.LogNorm(vmin=1, vmax=H.max()))
@@ -49,10 +49,16 @@ def plot_spectrum(jet_df, outdir):
     eta_ticks = [0.0, 0.5, 1.0, 1.5, 2.0, 2.5]
     plt.yticks(ticks=np.interp(eta_ticks, eta_bins, yrange), labels=eta_ticks)
     
-    ax.tick_params(axis='both', which='minor', width=1.2, length=2.5)
     ax.tick_params(axis='both', which='major', width=1.2, length=5)
+    ax.tick_params(axis='both', which='minor', width=1.2, length=2)
     
-    for ext in ['png', 'pdf']:
+    ax.tick_params(
+        axis='both', which='both', direction='in', 
+        bottom=True, top=True, left=True, right=True
+    )
+    plt.tight_layout()
+    
+    for ext in ['png', 'pdf', 'svg']:
         plt.savefig(os.path.join(outdir, ext, f'spectrum.{ext}'))
         
     plt.show()
@@ -60,7 +66,7 @@ def plot_spectrum(jet_df, outdir):
 
 
 def plot_target(jet_df, outdir):
-    fig = plt.figure(figsize=(8, 6.5))
+    fig = plt.figure(figsize=(6, 5.2))
     ax = fig.add_subplot()
 
 
@@ -69,16 +75,19 @@ def plot_target(jet_df, outdir):
     ax.yaxis.set_major_formatter(y_formatter)
     
     ax.hist(np.log(jet_df.pt_gen / jet_df.pt), bins=100, histtype='stepfilled', linewidth=2, facecolor='white', hatch='////', edgecolor='tab:blue')
-    ax.set_xlabel('$\log(p_T^\mathrm{gen} / p_T^\mathrm{reco})$')
+    ax.set_xlabel(r'$\log\left(\frac{p_T^\mathrm{gen}}{p_T^\mathrm{reco}}\right)$')
     ax.set_ylabel('Fraction of jets/bin')
     ax.set_xlim([-1.05, 1.05])
-    ax.tick_params(axis='both', which='major', width=1.2, length=7)
-    ax.tick_params(axis='both', which='minor', width=1.2, length=3)
+    ax.tick_params(axis='both', which='major', width=1.2, length=5)
+    ax.tick_params(axis='both', which='minor', width=1.2, length=2)
     
-    plt.tick_params(axis='both', which='both', direction='in')
     plt.minorticks_on()
-    
-    for ext in ['png', 'pdf']:
+    ax.tick_params(
+        axis='both', which='both', direction='in', 
+        bottom=True, top=True, left=True, right=True
+    )
+    plt.tight_layout()
+    for ext in ['png', 'pdf', 'svg']:
         plt.savefig(os.path.join(outdir, ext, f'target.{ext}'))
         
     plt.show()
