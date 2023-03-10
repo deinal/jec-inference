@@ -32,7 +32,7 @@ def plot_spectrum(jet_df, outdir):
     ax = fig.add_subplot()
     
     plt.imshow(np.flipud(H.T), aspect='auto', norm=mpl.colors.LogNorm(vmin=1, vmax=H.max()))
-    plt.xlabel('$p^\\mathrm{{gen}}_{T}$')
+    plt.xlabel('$p^\\mathrm{{gen}}_{T}$ [GeV]')
     plt.ylabel('$|\\eta^\\mathrm{{gen}}|$')
     plt.colorbar()
 
@@ -75,7 +75,7 @@ def plot_target(jet_df, outdir):
     ax.yaxis.set_major_formatter(y_formatter)
     
     ax.hist(np.log(jet_df.pt_gen / jet_df.pt), bins=100, histtype='stepfilled', linewidth=2, facecolor='white', hatch='////', edgecolor='tab:blue')
-    ax.set_xlabel(r'$\log\left(\frac{p_T^\mathrm{gen}}{p_T^\mathrm{reco}}\right)$')
+    ax.set_xlabel(r'$\log \left( p_T^\mathrm{gen} / p_T^\mathrm{reco} \right)$')
     ax.set_ylabel('Fraction of jets/bin')
     ax.set_xlim([-1.05, 1.05])
     ax.tick_params(axis='both', which='major', width=1.2, length=5)

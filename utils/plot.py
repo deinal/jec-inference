@@ -13,7 +13,7 @@ MARKERS = ['o', 's', '^', 'x', 'v']
 FLAVOR_MARKERS = ['o', 's', '^', 'x', 'v']
 COLORS = ['tab:blue', 'tab:orange', 'tab:green', 'tab:red', 'tab:purple']
 
-SMALL_SIZE = 12
+SMALL_SIZE = 14
 MEDIUM_SIZE = 14
 BIG_SIZE = 16
 
@@ -168,6 +168,8 @@ def compare_flavours(dataframe, names, fig_dir):
             )
         ax.set_xlim(-0.5, len(flavours) - 0.5)
         ax.axhline(1, ls='dashed', lw=0.8, c='gray')
+        if eta_bin == (0, 1.3):
+            ax.set_yticks([0.99, 1.00, 1.01, 1.02])
         ax.set_xticks(np.arange(len(flavours)))
         xlabels = [f[0] for f in flavours]
         ax.set_xticklabels(xlabels)
