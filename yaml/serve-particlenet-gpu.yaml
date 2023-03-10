@@ -1,0 +1,24 @@
+apiVersion: serving.kubeflow.org/v1beta1
+kind: InferenceService
+metadata:
+  name: particle-net-regressor-open-gpu
+  namespace: dholmber
+spec:
+  predictor:
+    serviceAccountName: sa
+    triton:
+      storageUri: s3://jec-data/particle-net-regressor-open-793295
+      runtimeVersion: 21.09-py3
+      env:
+        - name: OMP_NUM_THREADS
+          value: "1"
+      args: 
+        - --strict-model-config=false
+        - --log-verbose=1
+      resources:
+        limits:
+          nvidia.com/gpu: 1
+          memory:  4Gi
+        requests:
+          nvidia.com/gpu: 1
+          memory:   10Mi

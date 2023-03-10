@@ -1,0 +1,64 @@
+apiVersion: kubeflow.org/v1
+kind: PyTorchJob
+metadata:
+  name: export-job-jec-katib-pfn-regressor-open-de181d
+  namespace: dholmber
+spec:
+  pytorchReplicaSpecs:
+    Master:
+      replicas: 1
+      restartPolicy: Never
+      template:
+        metadata:
+          annotations:
+            sidecar.istio.io/inject: "false"
+        spec:
+          volumes:
+            - name: eos
+              hostPath:
+                path: /var/eos
+            - name: krb-secret-vol
+              secret:
+                secretName: krb-secret
+            - name: nvidia-driver
+              hostPath:
+                path: /opt/nvidia-driver
+                type: ""
+          containers:
+            - name: pytorch
+              resources: 
+                limits:
+                  cpu: 2
+                  memory: 12Gi
+                requests:
+                  cpu: 1
+                  memory: 8Gi
+              volumeMounts:
+                - name: eos
+                  mountPath: /eos
+                - name: krb-secret-vol
+                  mountPath: /secret/krb-secret-vol
+                - name: nvidia-driver
+                  mountPath: /opt/nvidia-driver
+              env:
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      key: AWS_ACCESS_KEY_ID
+                      name: s3-secret
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      key: AWS_SECRET_ACCESS_KEY
+                      name: s3-secret
+              image: registry.cern.ch/ml/weaver:latest
+              command:
+                - python
+                - train.py
+              args:
+                - '--data-config=data/jec_pfn_open.yaml'
+                - '--network-config=networks/pfn_regressor_open.py'
+                - '--network-option=num_edge_conv_blocks:1,k:1,num_conv_layers:5,conv_dim:50,num_fc_layers:3,fc_dim:400,dropout:0.009445883861381621,start_lr:0.0010778806449076722,optimizer:"ranger",num_epochs:50,batch_size:500,data_fraction:1'
+                - '--model-prefix=s3://jec-data/pfn-regressor-open-de181d/1_1_5_50_3_400_0.009445883861381621_0.0010778806449076722_ranger_50_500_1.pt'
+                - '--export-onnx=s3://jec-data/pfn-regressor-open-de181d/optimal/1/model.onnx'
+                - '--triton-config=s3://jec-data/pfn-regressor-open-de181d/optimal/config.pbtxt'
