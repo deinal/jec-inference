@@ -348,8 +348,8 @@ def plot_resolution(outdir, flavour_label, bins, bin_centers, eta_bin, ieta, bin
         axes_lower.set_ylim(0.86, 1.04)
     else:
         axes_upper.set_ylim(0.0, 0.23)
-        axes_lower.set_ylim(0.82, 1.04)
-        axes_lower.set_yticks([0.9, 1.0])
+        axes_lower.set_ylim(0.76, 1.10)
+        axes_lower.set_yticks([0.8, 1.0])
     for axes in [axes_upper, axes_lower]:
         axes.set_xscale('log')
         axes.set_xlim(binning[0], binning[-1])
