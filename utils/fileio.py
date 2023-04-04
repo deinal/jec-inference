@@ -12,9 +12,15 @@ def _concat(arrays, axis=0):
     else:
         return ak.concatenate(arrays, axis=axis)
     
-def _read_root(filepath, branches):
+def _read_root(filepath, branches, treename=None):
     with uproot.open(filepath) as f:
-        tree = f['Jets']
+        if treename is None:
+            treenames = set([k.split(';')[0] for k, v in f.items() if getattr(v, 'classname', '') == 'TTree'])
+        if len(treenames) == 1:
+            treename = treenames.pop()
+        else:
+            raise RuntimeError('Need to specify `treename` as more than one trees are found')
+        tree = f[treename]
         outputs = tree.arrays(branches)
     return outputs
 

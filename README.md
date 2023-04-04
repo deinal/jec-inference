@@ -1,14 +1,20 @@
 # jec-inference
 
+Results for Jet Energy Calibration with Deep Learning as a Kubeflow Pipeline
+
 ## Notebook setup
 
-Start notebook on https://ml-staging.cern.ch/_/jupyter/ with the `jupyter-scipy` image.
+Start a new notebook server on https://ml-staging.cern.ch/_/jupyter/.
 
 Install requirements `pip install -r requirements.txt`.
 
-Now you can run the `inference.ipynb` notebook.
+There are notebooks with data vizualisation, hyperparameter correlation, and inference results.
 
-## Jobs
+## Meetup demo
+
+Parallel inference demo for an MLOps meetup https://youtu.be/AWZT9ZYgohY
+
+Enter `./demo`
 
 Build inference image
 ```
@@ -23,7 +29,7 @@ Parallel inference on Kubeflow using Kuberenetes jobs
 
 Tried indexed queue with `indexed_job.yaml`. However, it used file from index zero for all jobs...
 
-Instead tried expansion of jobs 
+However, expansion of jobs worked
   - https://kubernetes.io/docs/tasks/job/parallel-processing-expansion/
   - Run: `./create_jobs.sh`
   - Monitor: `watch -n 1 kubectl get pods`

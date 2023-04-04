@@ -9,11 +9,11 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from functools import singledispatch
 
-MARKERS = ['x', 's', 'o', '^', 'v']
-FLAVOR_MARKERS = ['*', 's', 'o', '^', 'v']
+MARKERS = ['o', 's', '^', 'x', 'v']
+FLAVOR_MARKERS = ['o', 's', '^', 'x', 'v']
 COLORS = ['tab:blue', 'tab:orange', 'tab:green', 'tab:red', 'tab:purple']
 
-SMALL_SIZE = 12
+SMALL_SIZE = 14
 MEDIUM_SIZE = 14
 BIG_SIZE = 16
 
@@ -42,8 +42,8 @@ def plot_distrs(dataframe, names, fig_dir):
     """Plot distributions of response in a few representative bins."""
 
     binning = np.linspace(0.5, 1.5, num=101)
-    pt_bins = [(30, np.inf), (30, 40), (100, 110), (1000, 1100)]
-    eta_bins = [(0., 2.5), (2.5, 5)]
+    pt_bins = [(30, np.inf), (30, 100), (100, 300), (300, 1000), (1000, np.inf)]
+    eta_bins = [(0, 1.3), (1.3, 2.5)]
 
     histograms = {}
     for name in names:
@@ -70,7 +70,7 @@ def plot_distrs(dataframe, names, fig_dir):
     for ipt, ieta, flavour in itertools.product(
         range(len(pt_bins)), range(len(eta_bins)), ['all', 'uds', 'c', 'b', 'g']
     ):
-        fig = plt.figure()
+        fig = plt.figure(figsize=(6, 4.8))
         ax = fig.add_subplot()
         for i, name in enumerate(names):
             ax.hist(
@@ -106,8 +106,9 @@ def plot_distrs(dataframe, names, fig_dir):
             axis='both', which='both', direction='in', 
             bottom=True, top=True, left=True, right=True
         )
+        ax.tick_params(axis='both', which='both', width=1.2)
 
-        for ext in ['png', 'pdf']:
+        for ext in ['png', 'pdf', 'svg']:
             fig.savefig(os.path.join(fig_dir, ext, f'{flavour}_pt{ipt + 1}_eta{ieta + 1}.{ext}'))
         
         if (ipt == 0) and (flavour == 'all'):
@@ -134,8 +135,8 @@ def compare_flavours(dataframe, names, fig_dir):
     
     data = {}
 
-    pt_bins = [(30, np.inf), (30, 50), (50, 100), (100, 300), (300, 1000), (1000, np.inf)]
-    eta_bins = [(0., 2.5), (2.5, 5)]
+    pt_bins = [(30, np.inf), (30, 100), (100, 300), (300, 1000), (1000, np.inf)]
+    eta_bins = [(0, 1.3), (1.3, 2.5)]
 
     for (ipt, pt_bin), (ieta, eta_bin) in itertools.product(
         enumerate(pt_bins), enumerate(eta_bins)
@@ -154,7 +155,7 @@ def compare_flavours(dataframe, names, fig_dir):
             for name in names:
                 median[name].append(df[name].median())
                 median_error[name].append(bootstrap_median(df[name]))
-        fig = plt.figure()
+        fig = plt.figure(figsize=(6, 4.8))
         ax = fig.add_subplot()
         offset = [0.1 * i for i in range(len(names))]
         offset = offset - np.mean(offset)
@@ -167,6 +168,8 @@ def compare_flavours(dataframe, names, fig_dir):
             )
         ax.set_xlim(-0.5, len(flavours) - 0.5)
         ax.axhline(1, ls='dashed', lw=0.8, c='gray')
+        if eta_bin == (0, 1.3):
+            ax.set_yticks([0.99, 1.00, 1.01, 1.02])
         ax.set_xticks(np.arange(len(flavours)))
         xlabels = [f[0] for f in flavours]
         ax.set_xticklabels(xlabels)
@@ -195,8 +198,9 @@ def compare_flavours(dataframe, names, fig_dir):
             axis='both', which='both', direction='in', 
             bottom=True, top=True, left=True, right=True
         )
+        ax.tick_params(axis='both', which='both', width=1.2)
 
-        base_median = np.array(median['Standard'])
+        base_median = np.array(median['Baseline'])
         baseline = np.sum(np.abs(base_median - base_median.mean()))
         improvement = {}
         for name in names:
@@ -211,7 +215,7 @@ def compare_flavours(dataframe, names, fig_dir):
             'median_error': median_error
         }
 
-        for ext in ['png', 'pdf']:
+        for ext in ['png', 'pdf', 'svg']:
             fig.savefig(os.path.join(fig_dir, ext, f'pt{ipt+1}eta{ieta+1}.{ext}'))
         
         if pt_bin == (30, np.inf):
@@ -233,7 +237,7 @@ def plot_median_response(outdir, flavour_label, bins, bin_centers, eta_bin, ieta
         for i, (_, df) in enumerate(bins):
             median_error[name][i] = bootstrap_median(df[name].to_numpy())
 
-    fig = plt.figure(figsize=(6.4, 5.3))
+    fig = plt.figure(figsize=(6, 4.8))
     
     ax = fig.add_subplot()
     
@@ -258,9 +262,10 @@ def plot_median_response(outdir, flavour_label, bins, bin_centers, eta_bin, ieta
         axis='both', which='both', direction='in', 
         bottom=True, top=True, left=True, right=True
     )
+    ax.tick_params(axis='both', which='both', width=1.2)
     ax.set_xscale('log')
 
-    for ext in ['png', 'pdf']:
+    for ext in ['png', 'pdf', 'svg']:
         fig.savefig(os.path.join(outdir, ext, f'{flavour_label}_eta{ieta}.{ext}'))
         
     if flavour_label == 'all':
@@ -297,7 +302,7 @@ def compute_resolution_improvement(df, names):
     q2 = df.quantile(0.75)
     iqr = q2 - q1
     median = df.median()
-    baseline = iqr['Standard'] / median['Standard']
+    baseline = iqr['Baseline'] / median['Baseline']
     
     improvement = {}
     for name in names:
@@ -317,7 +322,7 @@ def plot_resolution(outdir, flavour_label, bins, bin_centers, eta_bin, ieta, bin
         for i, (_, df) in enumerate(bins):
             iqr_error[name][i] = bootstrap_iqr(df[name].to_numpy())
 
-    fig = plt.figure(figsize=(6.4, 5.3))
+    fig = plt.figure(figsize=(6, 4.8))
     gs = mpl.gridspec.GridSpec(2, 1, hspace=0.02, height_ratios=[4, 1])
     axes_upper = fig.add_subplot(gs[0, 0])
     axes_lower = fig.add_subplot(gs[1, 0])
@@ -326,25 +331,25 @@ def plot_resolution(outdir, flavour_label, bins, bin_centers, eta_bin, ieta, bin
     for i, name in enumerate(names):
         iqr_median[name] = iqr[name] / median[name]
         iqr_median_error[name] = iqr_error[name] / median[name]
-        ratio[name] = iqr_median[name] / iqr_median['Standard']
+        ratio[name] = iqr_median[name] / iqr_median['Baseline']
         improvement[name] = 100 * (1 - np.nanmean(ratio[name]))
         axes_upper.errorbar(
             bin_centers, iqr_median[name], yerr=iqr_median_error[name],
             color=COLORS[i], ms=3, marker=MARKERS[i], lw=0, elinewidth=0.8, label=name
         )
-        if name != 'Standard':
+        if name != 'Baseline':
             axes_lower.plot(
                 bin_centers, ratio[name], color=COLORS[i], ms=3, marker=MARKERS[i], lw=0
             )
 
     axes_upper.set_ylim(0, None)
     if eta_bin[0] == 0:
-        axes_upper.set_ylim(0.0, 0.31)
-        axes_lower.set_ylim(0.85, 1.02)
+        axes_upper.set_ylim(0.0, 0.23)
+        axes_lower.set_ylim(0.86, 1.04)
     else:
-        axes_upper.set_ylim(0.0, 0.38)
-        axes_lower.set_ylim(0.78, 1.02)
-        axes_lower.set_yticks([0.8, 0.9, 1.0])
+        axes_upper.set_ylim(0.0, 0.23)
+        axes_lower.set_ylim(0.76, 1.10)
+        axes_lower.set_yticks([0.8, 1.0])
     for axes in [axes_upper, axes_lower]:
         axes.set_xscale('log')
         axes.set_xlim(binning[0], binning[-1])
@@ -363,16 +368,16 @@ def plot_resolution(outdir, flavour_label, bins, bin_centers, eta_bin, ieta, bin
     axes_lower.set_ylabel('Ratio')
     axes_lower.set_xlabel(r'$p_\mathrm{T}^\mathrm{gen}$')
     axes_upper.tick_params(
-        axis='both', which='both', direction='in', 
+        axis='both', which='both', direction='in', width=1.2,
         bottom=True, top=True, left=True, right=True
     )
     axes_lower.tick_params(
-        axis='both', which='both', direction='in', 
+        axis='both', which='both', direction='in', width=1.2,
         bottom=True, top=True, left=True, right=True
     )
     fig.align_ylabels()
 
-    for ext in ['png', 'pdf']:
+    for ext in ['png', 'pdf', 'svg']:
         fig.savefig(os.path.join(outdir, ext, f'{flavour_label}_eta{ieta}_iqr.{ext}'))
     
     if flavour_label == 'all':
@@ -408,7 +413,7 @@ def plot_median_residual(outdir, bin_centers, flavour_labels, bins, eta_bin, iet
         difference[name] = median[name][0] - median[name][1]
         error[name] = np.sqrt(median_error[name][0] ** 2 + median_error[name][1] ** 2)
 
-    fig = plt.figure(figsize=(7.8, 5.3))
+    fig = plt.figure(figsize=(6, 4.8))
     ax = fig.add_subplot()
     for i, name in enumerate(names):
         ax.errorbar(
@@ -430,7 +435,7 @@ def plot_median_residual(outdir, bin_centers, flavour_labels, bins, eta_bin, iet
         bottom=True, top=True, left=True, right=True
     )
 
-    for ext in ['png', 'pdf']:
+    for ext in ['png', 'pdf', 'svg']:
         fig.savefig(os.path.join(outdir, ext, f'{flavour_labels[0]}-{flavour_labels[1]}_eta{ieta}.{ext}'))
         
     if flavour_labels == ('uds', 'g'):
@@ -459,12 +464,12 @@ if __name__ == '__main__':
 
     for subdir in ['distributions', 'flavours', 'response', 'resolution', 'residual']:
         try:
-            for ext in ['png', 'pdf']:
+            for ext in ['png', 'pdf', 'svg']:
                 os.makedirs(os.path.join(args.outdir, subdir, ext))
         except FileExistsError:
             pass
     
-    names = ['Standard'] + args.names
+    names = ['Baseline'] + args.names
     plot_distrs(df, names, os.path.join(args.outdir, 'distributions'))
     compare_flavours(df, names, os.path.join(args.outdir, 'flavours'))
 
@@ -473,7 +478,7 @@ if __name__ == '__main__':
 
     data = {}
     for (ieta, eta_bin), (flavour_label, flavour_ids) in itertools.product(
-        enumerate([(0, 2.5), (2.5, 5)], start=1),
+        enumerate([(0, 1.3), (1.3, 2.5)], start=1),
         [
             ('uds', {1, 2, 3}), ('c', {4}), ('b', {5}), ('g', {21}),
             ('all', {0, 1, 2, 3, 4, 5, 21})
@@ -497,7 +502,7 @@ if __name__ == '__main__':
         )
 
         for (ipt, pt_bin) in enumerate(
-                [(30, np.inf), (30, 50), (50, 100), (100, 300), (300, 1000), (1000, np.inf)], start=1
+                [(30, np.inf), (30, 100), (100, 300), (300, 1000), (1000, np.inf)], start=1
             ):
             pt_bin = df_bin[
                 (df_bin.pt_gen >= pt_bin[0])
@@ -509,7 +514,7 @@ if __name__ == '__main__':
         json.dump(data, f, indent='\t', default=to_serializable)
     
     for (ieta, eta_bin), flavours in itertools.product(
-        enumerate([(0, 2.5), (2.5, 5)], start=1),
+        enumerate([(0, 1.3), (1.3, 2.5)], start=1),
         itertools.combinations([('uds', {1, 2, 3}), ('c', {4}), ('b', {5}), ('g', {21})], r=2),
     ):
         bins = []
